@@ -164,30 +164,28 @@ class _CustomAppBarState extends State<CustomAppBar> {
     );
   }
 
-  // Tablet Navigation Menu - Compact navigation only
+  // Tablet Navigation Menu - Text-based navigation with tablet-optimized sizing
   Widget _buildTabletMenu(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            color: const Color(0xFF8B4513),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildCompactNavItem(context, Icons.home, '/'),
-              _buildCompactNavItem(context, Icons.shopping_bag, '/shop'),
-              _buildCompactNavItem(context, Icons.info, '/about'),
-              _buildCompactNavItem(context, Icons.contact_mail, '/contact'),
-            ],
-          ),
-        ),
+        _buildTabletNavItem(context, 'Home', '/'),
+        _buildTabletNavItem(context, 'Shop', '/shop'),
+        _buildTabletNavItem(context, 'About', '/about'),
+        _buildTabletNavItem(context, 'Contact', '/contact'),
+        _buildTabletNavItem(context, 'Blog', '/blog'),
         // 20px spacing between nav items and shop button
         const SizedBox(width: 20),
         _buildAnimatedShopButton(isCompact: true),
       ],
+    );
+  }
+
+  // Tablet Navigation Item - Text-based with smaller sizing
+  Widget _buildTabletNavItem(BuildContext context, String title, String route) {
+    return _AnimatedTabletNavItem(
+      title: title,
+      route: route,
     );
   }
 
@@ -201,25 +199,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
     return _AnimatedNavItem(
       title: title,
       route: route,
-    );
-  }
-
-  // Compact Navigation Item for Tablet
-  Widget _buildCompactNavItem(BuildContext context, IconData icon, String route) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => Navigator.pushNamed(context, route),
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          child: Icon(
-            icon,
-            color: Colors.white,
-            size: 20,
-          ),
-        ),
-      ),
     );
   }
 
@@ -392,6 +371,72 @@ class _AnimatedNavItemState extends State<_AnimatedNavItem> {
   }
 }
 
+// New Tablet Navigation Item Widget
+class _AnimatedTabletNavItem extends StatefulWidget {
+  final String title;
+  final String route;
+
+  const _AnimatedTabletNavItem({
+    required this.title,
+    required this.route,
+  });
+
+  @override
+  State<_AnimatedTabletNavItem> createState() => _AnimatedTabletNavItemState();
+}
+
+class _AnimatedTabletNavItemState extends State<_AnimatedTabletNavItem> {
+  bool isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.only(top: 8, bottom: 0, left: 6, right: 6),
+        child: MouseRegion(
+          onEnter: (_) => setState(() => isHovered = true),
+          onExit: (_) => setState(() => isHovered = false),
+          child: InkWell(
+            onTap: () => Navigator.pushNamed(context, widget.route),
+            borderRadius: BorderRadius.circular(6),
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontFamily: 'Cinzel',
+                      color: Color(0xFF8B4513),
+                      fontSize: 14, // Smaller font size for tablet
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    height: 2,
+                    width: isHovered ? 40 : 0, // Slightly smaller underline
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF8B4513),
+                      borderRadius: BorderRadius.circular(1),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _AnimatedShopButton extends StatefulWidget {
   final bool isCompact;
 
@@ -446,7 +491,7 @@ class _AnimatedShopButtonState extends State<_AnimatedShopButton> {
                   turns: isHovered ? 0.05 : 0,
                   duration: const Duration(milliseconds: 250),
                   child: Icon(
-                    Icons.shopping_cart,
+                    Icons.door_back_door_outlined,
                     size: widget.isCompact ? 14 : 15,
                     color: Colors.white,
                   ),
@@ -461,7 +506,7 @@ class _AnimatedShopButtonState extends State<_AnimatedShopButton> {
                     color: Colors.white,
                     letterSpacing: isHovered ? 0.5 : 0.3,
                   ),
-                  child: const Text('Shop Now'),
+                  child: const Text('Login'),
                 ),
               ],
             ),

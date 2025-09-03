@@ -13,12 +13,19 @@ class _HeroSectionState extends State<HeroSection>
   late Animation<double> _slideAnimation;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
+  
+  // New controllers for text animations
+  late AnimationController _textController;
+  late Animation<double> _firstLineSlideAnimation;
+  late Animation<double> _firstLineFadeAnimation;
+  late Animation<double> _secondLineSlideAnimation;
+  late Animation<double> _secondLineFadeAnimation;
 
   @override
   void initState() {
     super.initState();
     
-    // Slide animation controller
+    // Slide animation controller (for product showcase)
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 3000),
       vsync: this,
@@ -47,11 +54,58 @@ class _HeroSectionState extends State<HeroSection>
       curve: Curves.easeIn,
     ));
     
+    // Text animation controller
+    _textController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+    
+    // First line animation (Bringing Simplicity) - starts at 0.0, ends at 0.4
+    _firstLineSlideAnimation = Tween<double>(
+      begin: -100.0, // Start from left (off screen)
+      end: 0.0,      // End at normal position
+    ).animate(CurvedAnimation(
+      parent: _textController,
+      curve: const Interval(0.0, 0.4, curve: Curves.easeOutCubic),
+    ));
+    
+    _firstLineFadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _textController,
+      curve: const Interval(0.0, 0.4, curve: Curves.easeIn),
+    ));
+    
+    // Second line animation (In The Home Decor Market) - starts at 0.3, ends at 0.8
+    _secondLineSlideAnimation = Tween<double>(
+      begin: -100.0, // Start from left (off screen)
+      end: 0.0,      // End at normal position
+    ).animate(CurvedAnimation(
+      parent: _textController,
+      curve: const Interval(0.3, 0.8, curve: Curves.easeOutCubic),
+    ));
+    
+    _secondLineFadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _textController,
+      curve: const Interval(0.3, 0.8, curve: Curves.easeIn),
+    ));
+    
     // Start animations with delay
     Future.delayed(const Duration(milliseconds: 0), () {
       if (mounted) {
         _fadeController.forward();
         _slideController.forward();
+      }
+    });
+    
+    // Start text animation after 1 second
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      if (mounted) {
+        _textController.forward();
       }
     });
   }
@@ -60,6 +114,7 @@ class _HeroSectionState extends State<HeroSection>
   void dispose() {
     _slideController.dispose();
     _fadeController.dispose();
+    _textController.dispose();
     super.dispose();
   }
 
@@ -118,15 +173,49 @@ class _HeroSectionState extends State<HeroSection>
               children: [
                 SizedBox(
                   width: isMobile ? screenWidth - 40 : (isTablet ? 350 : 400),
-                  child: Text(
-                    'Bringing Simplicity\nIn The Home Decor Market',
-                    style: TextStyle(
-                      fontFamily: 'The Seasons',
-                      fontSize: isMobile ? 28 : (isTablet ? 36 : 48),
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF8B4513),
-                      height: 1.2,
-                    ),
+                  child: AnimatedBuilder(
+                    animation: _textController,
+                    builder: (context, child) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // First line: "Bringing Simplicity"
+                          Transform.translate(
+                            offset: Offset(_firstLineSlideAnimation.value, 0),
+                            child: Opacity(
+                              opacity: _firstLineFadeAnimation.value,
+                              child: Text(
+                                'Bringing Simplicity',
+                                style: TextStyle(
+                                  fontFamily: 'The Seasons',
+                                  fontSize: isMobile ? 28 : (isTablet ? 36 : 48),
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF8B4513),
+                                  height: 1.2,
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Second line: "In The Home Decor Market"
+                          Transform.translate(
+                            offset: Offset(_secondLineSlideAnimation.value, 0),
+                            child: Opacity(
+                              opacity: _secondLineFadeAnimation.value,
+                              child: Text(
+                                'In The Home Decor Market',
+                                style: TextStyle(
+                                  fontFamily: 'The Seasons',
+                                  fontSize: isMobile ? 28 : (isTablet ? 36 : 48),
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF8B4513),
+                                  height: 1.2,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
                 SizedBox(height: isMobile ? 15 : 20),
@@ -172,7 +261,7 @@ class _HeroSectionState extends State<HeroSection>
 
           /// Animated Product Container
           Positioned(
-            bottom: isMobile ? 5 : 60,
+            bottom: isMobile ? 20 : 60,
             right: isMobile ? 5 : 20,
             child: AnimatedBuilder(
               animation: Listenable.merge([_slideAnimation, _fadeAnimation]),
@@ -356,7 +445,7 @@ class _ProductShowcaseState extends State<ProductShowcase>
                   Expanded(
                     flex: 2,
                     child: Padding(
-                      padding: EdgeInsets.all(widget.isMobile ? 8 : 12),
+                      padding: EdgeInsets.all(widget.isMobile ? 4 : 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -367,7 +456,7 @@ class _ProductShowcaseState extends State<ProductShowcase>
                               Text(
                                 'Premium Decor',
                                 style: TextStyle(
-                                  fontSize: widget.isMobile ? 12 : 14,
+                                  fontSize: widget.isMobile ? 10 : 12,
                                   fontWeight: FontWeight.bold,
                                   color: const Color(0xFF8B4513),
                                   fontFamily: 'The Seasons',
@@ -375,15 +464,15 @@ class _ProductShowcaseState extends State<ProductShowcase>
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 2),
                               Text(
                                 'Elegant Home Collection',
                                 style: TextStyle(
-                                  fontSize: widget.isMobile ? 10 : 12,
+                                  fontSize: widget.isMobile ? 8 : 12,
                                   color: const Color(0xFF5D4E37),
                                   fontFamily: 'Cinzel',
                                 ),
-                                maxLines: 2,
+                                maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],
@@ -399,7 +488,7 @@ class _ProductShowcaseState extends State<ProductShowcase>
                               duration: const Duration(milliseconds: 200),
                               width: double.infinity,
                               padding: EdgeInsets.symmetric(
-                                vertical: widget.isMobile ? 6 : 8,
+                                vertical: widget.isMobile ? 6 : 6,
                               ),
                               decoration: BoxDecoration(
                                 color: _isHovered 
