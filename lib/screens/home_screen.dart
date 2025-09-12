@@ -28,14 +28,16 @@ class _HomeScreenState extends State<HomeScreen> {
             // Hero Section
             const HeroSection(),
 
+             // Product Showcase Section
+            const ProductShowcaseSection(),
+
             // About Preview Section
             const AboutPreviewSection(),
 
             // Philosophy Section
             const PhilosophySection(),
 
-            // Product Showcase Section
-            const ProductShowcaseSection(),
+           
 
             // Why Choose Us Section
             const WhyChooseUsSection(),

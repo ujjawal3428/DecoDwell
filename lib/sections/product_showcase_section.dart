@@ -64,17 +64,19 @@ class _ProductShowcaseSectionState extends State<ProductShowcaseSection>
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600 && screenWidth <= 1024;
-    final isMobile = screenWidth <= 600;
+    final isTablet = screenWidth > 768 && screenWidth <= 1200;
+    final isMobile = screenWidth <= 768;
+    final _ = screenWidth > 1200;
 
-    final horizontalPadding = isMobile ? 20.0 : (isTablet ? 40.0 : 80.0);
-    final crossAxisCount = isMobile ? 1 : (isTablet ? 2 : 3);
+    // Updated responsive settings
+    final horizontalPadding = isMobile ? 16.0 : (isTablet ? 32.0 : 60.0);
+    final crossAxisCount = isMobile ? 2 : (isTablet ? 3 : 4);
 
     return Container(
       key: const ValueKey('product_showcase_section'),
       padding: EdgeInsets.symmetric(
         horizontal: horizontalPadding,
-        vertical: isMobile ? 60 : 80,
+        vertical: isMobile ? 40 : 60,
       ),
       child: Column(
         children: [
@@ -114,7 +116,7 @@ class _ProductShowcaseSectionState extends State<ProductShowcaseSection>
             },
           ),
           
-          SizedBox(height: isMobile ? 15 : 20),
+          SizedBox(height: isMobile ? 12 : 16),
           
           // Animated Description with blur transition
           AnimatedBuilder(
@@ -158,9 +160,9 @@ class _ProductShowcaseSectionState extends State<ProductShowcaseSection>
             },
           ),
           
-          SizedBox(height: isMobile ? 40 : 60),
+          SizedBox(height: isMobile ? 30 : 40),
 
-          // Enhanced Product Grid with stagger animation
+          // Enhanced Product Grid with stagger animation - Updated spacing and aspect ratio
           AnimatedBuilder(
             animation: _staggerController,
             builder: (context, child) {
@@ -169,9 +171,10 @@ class _ProductShowcaseSectionState extends State<ProductShowcaseSection>
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisCount: crossAxisCount,
-                crossAxisSpacing: isMobile ? 15 : (isTablet ? 20 : 30),
-                mainAxisSpacing: isMobile ? 15 : (isTablet ? 20 : 30),
-                childAspectRatio: isMobile ? 1.1 : 0.8,
+                crossAxisSpacing: isMobile ? 12 : (isTablet ? 16 : 20),
+                mainAxisSpacing: isMobile ? 16 : (isTablet ? 20 : 24),
+                // Reduced aspect ratio to make cards smaller
+                childAspectRatio: isMobile ? 0.85 : (isTablet ? 0.9 : 0.95),
                 children: [
                   _buildAnimatedProductCard(
                     'Decorative Tissue Box Cover',
@@ -276,7 +279,8 @@ class _ProductShowcaseSectionState extends State<ProductShowcaseSection>
     int index,
   ) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth <= 600;
+    final isMobile = screenWidth <= 768;
+    final isTablet = screenWidth > 768 && screenWidth <= 1200;
 
     return GestureDetector(
       onTap: () {
@@ -294,35 +298,31 @@ class _ProductShowcaseSectionState extends State<ProductShowcaseSection>
             final isHovered = _cardHovered[index];
             
             return AnimatedContainer(
-              duration: const Duration(milliseconds: 400),
+              duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutCubic,
-              transform: Matrix4.identity()
-                ..setEntry(3, 2, 0.001) // perspective
-                ..rotateX(isHovered ? -0.05 : 0.0)
-                ..rotateY(isHovered ? 0.05 : 0.0)
-                ..scale(isHovered ? 1.05 : 1.0),
+              // Removed scale transformation on hover
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   // Primary shadow for 3D effect
                   BoxShadow(
-                    color: const Color(0xFF8B4513).withValues(alpha : 0.15 + (hoverValue * 0.1)),
-                    blurRadius: 15 + (hoverValue * 10),
-                    offset: Offset(0, 8 + (hoverValue * 8)),
+                    color: const Color(0xFF8B4513).withValues(alpha: 0.12 + (hoverValue * 0.08)),
+                    blurRadius: 12 + (hoverValue * 8),
+                    offset: Offset(0, 6 + (hoverValue * 6)),
                     spreadRadius: -2,
                   ),
                   // Secondary shadow for depth
                   BoxShadow(
-                    color: const Color(0xFF5D4E37).withValues(alpha : 0.08 + (hoverValue * 0.05)),
-                    blurRadius: 30 + (hoverValue * 15),
-                    offset: Offset(0, 15 + (hoverValue * 10)),
-                    spreadRadius: -5,
+                    color: const Color(0xFF5D4E37).withValues(alpha: 0.06 + (hoverValue * 0.04)),
+                    blurRadius: 20 + (hoverValue * 10),
+                    offset: Offset(0, 10 + (hoverValue * 8)),
+                    spreadRadius: -4,
                   ),
                   // Highlight shadow for realism
                   BoxShadow(
-                    color: Colors.white.withValues(alpha : isHovered ? 0.1 : 0.05),
-                    blurRadius: 5,
-                    offset: const Offset(0, -2),
+                    color: Colors.white.withValues(alpha: isHovered ? 0.08 : 0.04),
+                    blurRadius: 4,
+                    offset: const Offset(0, -1),
                     spreadRadius: 0,
                   ),
                 ],
@@ -330,10 +330,10 @@ class _ProductShowcaseSectionState extends State<ProductShowcaseSection>
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: isHovered 
-                        ? const Color(0xFFD4AF37).withValues(alpha : 0.3)
+                        ? const Color(0xFFD4AF37).withValues(alpha: 0.25)
                         : Colors.transparent,
                     width: 1,
                   ),
@@ -342,8 +342,9 @@ class _ProductShowcaseSectionState extends State<ProductShowcaseSection>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
+                      flex: 3, // Adjusted flex to control image height
                       child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                         child: Container(
                           width: double.infinity,
                           decoration: const BoxDecoration(
@@ -351,13 +352,13 @@ class _ProductShowcaseSectionState extends State<ProductShowcaseSection>
                           ),
                           child: Stack(
                             children: [
-                              // Main Image with blur transition on hover
+                              // Main Image with subtle blur transition on hover
                               AnimatedContainer(
                                 duration: const Duration(milliseconds: 300),
                                 child: ImageFiltered(
                                   imageFilter: ImageFilter.blur(
-                                    sigmaX: isHovered ? 0.5 : 0.0,
-                                    sigmaY: isHovered ? 0.5 : 0.0,
+                                    sigmaX: isHovered ? 0.2 : 0.0,
+                                    sigmaY: isHovered ? 0.2 : 0.0,
                                   ),
                                   child: Image.asset(
                                     imagePath,
@@ -374,7 +375,7 @@ class _ProductShowcaseSectionState extends State<ProductShowcaseSection>
                                             end: Alignment.bottomRight,
                                             colors: [
                                               const Color(0xFFF5F1EB),
-                                              const Color(0xFFE8DCC0).withValues(alpha : 0.8),
+                                              const Color(0xFFE8DCC0).withValues(alpha: 0.8),
                                             ],
                                           ),
                                         ),
@@ -384,16 +385,16 @@ class _ProductShowcaseSectionState extends State<ProductShowcaseSection>
                                             children: [
                                               Icon(
                                                 Icons.image_outlined,
-                                                size: isMobile ? 40 : 50,
-                                                color: const Color(0xFF8B4513).withValues(alpha : 0.4),
+                                                size: isMobile ? 24 : (isTablet ? 28 : 32),
+                                                color: const Color(0xFF8B4513).withValues(alpha: 0.4),
                                               ),
-                                              const SizedBox(height: 8),
+                                              const SizedBox(height: 6),
                                               Text(
                                                 'Image Coming Soon',
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
-                                                  color: const Color(0xFF8B4513).withValues(alpha : 0.6),
-                                                  fontSize: isMobile ? 12 : 14,
+                                                  color: const Color(0xFF8B4513).withValues(alpha: 0.6),
+                                                  fontSize: isMobile ? 10 : 12,
                                                   fontWeight: FontWeight.w500,
                                                 ),
                                               ),
@@ -406,98 +407,74 @@ class _ProductShowcaseSectionState extends State<ProductShowcaseSection>
                                 ),
                               ),
                               
-                              // Enhanced gradient overlay with blur effect
+                              // Subtle gradient overlay
                               Positioned.fill(
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 300),
-                                  child: BackdropFilter(
-                                    filter: ImageFilter.blur(
-                                      sigmaX: isHovered ? 0.3 : 0.0,
-                                      sigmaY: isHovered ? 0.3 : 0.0,
-                                    ),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            Colors.transparent,
-                                            isHovered
-                                                ? const Color(0xFF8B4513).withValues(alpha : 0.15)
-                                                : Colors.transparent,
-                                          ],
-                                        ),
-                                      ),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.transparent,
+                                        isHovered
+                                            ? const Color(0xFF8B4513).withValues(alpha: 0.08)
+                                            : Colors.transparent,
+                                      ],
                                     ),
                                   ),
                                 ),
                               ),
-                              
-                              // Shimmer effect on hover
-                              if (isHovered)
-                                Positioned.fill(
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 600),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: const Alignment(-1.0, -0.3),
-                                        end: const Alignment(1.0, 0.3),
-                                        colors: [
-                                          Colors.transparent,
-                                          Colors.white.withValues(alpha : 0.1),
-                                          Colors.transparent,
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
                             ],
                           ),
                         ),
                       ),
                     ),
                     
-                    // Enhanced card content with blur transition
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      padding: EdgeInsets.all(isMobile ? 18 : 24),
-                      child: ImageFiltered(
-                        imageFilter: ImageFilter.blur(
-                          sigmaX: isHovered ? 0.0 : 0.0,
-                          sigmaY: isHovered ? 0.0 : 0.0,
-                        ),
+                    // Enhanced card content with smaller padding
+                    Expanded(
+                      flex: 2, // Adjusted flex to control content height
+                      child: Container(
+                        padding: EdgeInsets.all(isMobile ? 12 : (isTablet ? 14 : 16)),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            AnimatedDefaultTextStyle(
-                              duration: const Duration(milliseconds: 300),
-                              style: TextStyle(
-                                fontSize: isMobile ? 14 : 16,
-                                fontWeight: FontWeight.bold,
-                                color: isHovered 
-                                    ? const Color(0xFF6B3410)
-                                    : const Color(0xFF8B4513),
+                            Flexible(
+                              child: AnimatedDefaultTextStyle(
+                                duration: const Duration(milliseconds: 300),
+                                style: TextStyle(
+                                  fontSize: isMobile ? 12 : (isTablet ? 13 : 14),
+                                  fontWeight: FontWeight.bold,
+                                  color: isHovered 
+                                      ? const Color(0xFF6B3410)
+                                      : const Color(0xFF8B4513),
+                                ),
+                                child: Text(
+                                  name,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                              child: Text(name),
                             ),
-                            SizedBox(height: isMobile ? 8 : 10),
+                            SizedBox(height: isMobile ? 6 : 8),
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
                               padding: EdgeInsets.symmetric(
-                                horizontal: isMobile ? 12 : 16,
-                                vertical: isMobile ? 6 : 8,
+                                horizontal: isMobile ? 8 : (isTablet ? 10 : 12),
+                                vertical: isMobile ? 4 : 6,
                               ),
                               decoration: BoxDecoration(
                                 color: isHovered
-                                    ? const Color(0xFFD4AF37).withValues(alpha : 0.4)
-                                    : const Color(0xFFD4AF37).withValues(alpha : 0.2),
-                                borderRadius: BorderRadius.circular(25),
+                                    ? const Color(0xFFD4AF37).withValues(alpha: 0.35)
+                                    : const Color(0xFFD4AF37).withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(20),
                                 boxShadow: isHovered
                                     ? [
                                         BoxShadow(
-                                          color: const Color(0xFFD4AF37).withValues(alpha : 0.3),
-                                          blurRadius: 8,
+                                          color: const Color(0xFFD4AF37).withValues(alpha: 0.2),
+                                          blurRadius: 6,
                                           offset: const Offset(0, 2),
                                         ),
                                       ]
@@ -506,7 +483,7 @@ class _ProductShowcaseSectionState extends State<ProductShowcaseSection>
                               child: AnimatedDefaultTextStyle(
                                 duration: const Duration(milliseconds: 300),
                                 style: TextStyle(
-                                  fontSize: isMobile ? 11 : 13,
+                                  fontSize: isMobile ? 10 : (isTablet ? 11 : 12),
                                   color: isHovered 
                                       ? const Color(0xFF6B3410)
                                       : const Color(0xFF8B4513),
